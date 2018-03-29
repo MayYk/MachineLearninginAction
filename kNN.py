@@ -2,6 +2,8 @@
 # _*_ coding:utf-8 _*_
 from numpy import *
 import operator
+import matplotlib
+import matplotlib.pyplot as plt
 
 #初始数据
 def createDataSet():
@@ -12,7 +14,7 @@ def createDataSet():
 #分类器
 #inx表示输入向量，dataSet表示输入的训练样本集，labels是标签向量，参数k表示用于选择最近邻居的数目
 def classify0(inX, dataSet, labels, k):
-    # dataSet.shap表示数组各维的大小
+    # dataSet.shape[x]表示数组各维的大小,x=1为第一维的长度，x=2为第二维的长度。
     dataSetSize = dataSet.shape[0]
 
     # tile(inX,(a,b))函数将inX重复a行，重复b列
@@ -41,14 +43,69 @@ def classify0(inX, dataSet, labels, k):
 
     return sortedClassCount[0][0]
 
+# 文本 to 矩阵
 def file2matrix(filename):
     fr = open(filename)
     arrayOfLines = fr.readlines()
     numberOfLines = len(arrayOfLines)
+
+    #zeros((a,b))生成一个a行b列的0矩阵
     returnMat = zeros((numberOfLines,3))
+    classLabelVector = []
+    index = 0
+    for line in arrayOfLines:
+        #str.strip('0')，移除字符串首尾指定字符'0s'
+        line = line.strip()
+        listFromLine = line.split('\t')
+        returnMat[index,:] = listFromLine[0:3]
+        classLabelVector.append(int(listFromLine[-1]))
+        index += 1
+    return returnMat,classLabelVector
 
+# 归一化特征值
+def autoNorm(dataSet):
+    minVals = dataSet.min(0)
+    maxVals = dataSet.max(0)
+    ranges = maxVals - minVals
+    normDataSet = zeros(shape(dataSet))
+    m = dataSet.shape[0]
+    normDataSet = dataSet - tile(minVals,(m,1))
+    normDataSet = dataSet/tile(ranges,(m,1))
+    return normDataSet, ranges, minVals
 
-group,labels = createDataSet()
-print(group)
-print(labels)
-print(classify0([0,0],group,labels,3))
+def datingClassTest():
+    hoRatio = 0.10
+    datingDataMat,datingLabels = file2matrix('datingTestSet2.txt')
+    normMat, ranges, minVals = autoNorm(datingDataMat)
+    m = normMat.shape[0]
+    numTestVecs = int(m * hoRatio)
+    errorCount = 0.0
+    for i in range(numTestVecs):
+        classifierResult = classify0(normMat[i,:],normMat[numTestVecs:m,:], datingLabels[numTestVecs:m],3)
+        print("the classifier came back with: %d,the real answer is: %d" %(classifierResult, datingLabels[i]))
+        if(classifierResult != datingLabels[i]):
+            errorCount += 1.0
+    print("the total error rate is: %f" % (errorCount/float(numTestVecs)))
+
+# group,labels = createDataSet()
+# print(group)
+# print(labels)
+# print(classify0([0,0],group,labels,3))
+# file2matrix('datingTestSet2.txt')
+datingDataMat,datingLabels = file2matrix('datingTestSet2.txt')
+# print(datingLabels)
+
+# Matplotlib对象简介
+# FigureCanvas  画布
+# Figure        图
+# Axes          坐标轴(实际画图的地方)
+fig = plt.figure()
+
+#add_subplot(xyz)，将画布分为x行y列，取第z块
+#add_subplot(x,y,z)，将画布分为x行y列，取第z块
+ax = fig.add_subplot(111)
+
+# 这里逗号分开两维，逗号前取行，逗号后取列
+ax.scatter(datingDataMat[:,0], datingDataMat[:,1], 15.0*array(datingLabels), 15.0*array(datingLabels))
+plt.show()
+datingClassTest()
