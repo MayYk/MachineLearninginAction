@@ -54,7 +54,7 @@ def file2matrix(filename):
     classLabelVector = []
     index = 0
     for line in arrayOfLines:
-        #str.strip('0')，移除字符串首尾指定字符'0s'
+        #str.strip('0')，移除字符串首尾指定字符'0'
         line = line.strip()
         listFromLine = line.split('\t')
         returnMat[index,:] = listFromLine[0:3]
@@ -87,25 +87,25 @@ def datingClassTest():
             errorCount += 1.0
     print("the total error rate is: %f" % (errorCount/float(numTestVecs)))
 
-# group,labels = createDataSet()
-# print(group)
-# print(labels)
-# print(classify0([0,0],group,labels,3))
-# file2matrix('datingTestSet2.txt')
-datingDataMat,datingLabels = file2matrix('datingTestSet2.txt')
-# print(datingLabels)
+def classifyPerson():
+    resultList = ['not at all','in small doses','in large doses']
 
-# Matplotlib对象简介
-# FigureCanvas  画布
-# Figure        图
-# Axes          坐标轴(实际画图的地方)
-fig = plt.figure()
+    percentTats = float(input('percentage of time spent playing video games?'))
+    ffMiles =  float(input('frequent filer miles earned per year?'))
+    iceCream = float(input('liters of ice cream consumed per year?'))
 
-#add_subplot(xyz)，将画布分为x行y列，取第z块
-#add_subplot(x,y,z)，将画布分为x行y列，取第z块
-ax = fig.add_subplot(111)
+    datingDataMat,datingLabels = file2matrix('datingTestSet2.txt')
+    normMat, ranges, minVals = autoNorm(datingDataMat)
+    inArr = array([ffMiles, percentTats, iceCream])
 
-# 这里逗号分开两维，逗号前取行，逗号后取列
-ax.scatter(datingDataMat[:,0], datingDataMat[:,1], 15.0*array(datingLabels), 15.0*array(datingLabels))
-plt.show()
+    classifierResult = classify0((inArr - minVals)/ranges,normMat,datingLabels,3)
+    print('You will probaly like this person:',resultList[classifierResult - 1])
+
+# datingDataMat,datingLabels = file2matrix('datingTestSet2.txt')
+# fig = plt.figure()
+# ax = fig.add_subplot(111)
+# datingDataMat = autoNorm(datingDataMat)[0]
+# ax.scatter(datingDataMat[:,0], datingDataMat[:,1], 15.0*array(datingLabels), 15.0*array(datingLabels))
+# plt.show()
 datingClassTest()
+# classifyPerson()
