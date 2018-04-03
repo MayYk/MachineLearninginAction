@@ -1,7 +1,8 @@
 #!user/bin/env python
 # _*_ coding:utf-8 _*_
-import TreePloter as treePlt
 import trees as trees
+import TreePlotter as treePlt
+
 def classify(inputTree, featLabels, testVec):
     firstStr = inputTree.keys()[0]
     secondDict = inputTree[firstStr]
