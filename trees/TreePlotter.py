@@ -2,17 +2,29 @@
 # _*_ coding:utf-8 _*_
 import matplotlib.pyplot as plt
 
-# boxstyle = "swatooth"意思是注解框的边缘是波浪线型的，fc控制的注解框内的颜色深度
+# boxstyle = "swatooth"意思是注解框的边缘是波浪线型的，fc是边框线粗细
 decisionNode = dict(boxstyle='sawtooth', fc='0.8')
+# 定义决策树的叶子结点的描述属性
 leafNode = dict(boxstyle='round4', fc='0.8')
+# 定义决策树的箭头属性
 arrow_args = dict(arrowstyle = '<-')
 
 def plotNode(nodeText, centerPt, parentPt, nodeType):
+    # nodeTxt为要显示的文本，centerPt为文本的中心点，箭头所在的点，parentPt为指向文本的点
     createPlot.ax1.annotate(nodeText, xy=parentPt, xycoords ='axes fraction', xytext=centerPt, textcoords='axes fraction', va='center', ha='center', bbox=nodeType, arrowprops=arrow_args)
 
 def createPlot():
+    # Matplotlib对象简介
+    # FigureCanvas  画布
+    # Figure        图
+    # Axes          坐标轴(实际画图的地方)
+
+    # 定义一个画布，背景为白色
     fig = plt.figure(1,facecolor='white')
+    # 把画布清空
     fig.clf()
+    # createPlot.ax1为全局变量，绘制图像的句柄，subplot为定义了一个绘图，111表示figure中的图有1行1列，即1个，最后的1代表第一个图
+    # frameon表示是否绘制坐标轴矩形
     createPlot.ax1 = plt.subplot(111,frameon = False)
     plotNode('决策节点', (0.5,0.1), (0.1,0.5), decisionNode)
     plotNode('叶节点', (0.8,0.1), (0.3,0.8), leafNode)
@@ -57,6 +69,7 @@ def plotTree(myTree, parentPt,nodeText):
     numLeafs = getNumLeafs(myTree)
     depth = getTreeDepth(myTree)
     firstStr = list(myTree.keys())[0]
+    # 计算坐标，x坐标为当前树的叶子结点数目除以整个树的叶子结点数再除以2，y为起点
     cntrPt = (plotTree.x0ff + (1.0 + float(numLeafs))/2.0/plotTree.totalW,plotTree.y0ff)
     plotMidText(cntrPt, parentPt, nodeText)
     plotNode(firstStr, cntrPt, parentPt, decisionNode)
