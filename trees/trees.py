@@ -58,7 +58,6 @@ def chooseBestFeatureToSplit(dataSet):
             subDataSet = splitDataSet(dataSet,i,value)
             prob = len(subDataSet)/float(len(dataSet))
             newEntropy += prob * calcShannonEnt(subDataSet)
-        print('------------------------------------------------3')
         infoGain = baseEntropy - newEntropy
         #计算最好信息收益
         if infoGain > bestInfoGain :
@@ -80,6 +79,7 @@ def majorityCnt(classList):
 def creatTree(dataSet, labels):
     classList = [example[-1] for example in dataSet]
     # 类别完全相同则停止划分
+    # count() 方法用于统计某个元素在列表中出现的次数
     if classList.count(classList[0]) == len(classList):
         return classList[0]
     # 遍历完所有特征是返回出现最多的类别
