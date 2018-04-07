@@ -96,9 +96,10 @@ def creatTree(dataSet, labels):
     for value in uniqueValues:
         # 子标签subLabels为labels删除bestFeat标签后剩余的标签
         subLabels = labels[:]
-        myTree[bestFeatLabel][value] = creatTree(splitDataSet(dataSet, bestFeat, value), subLabels)
+        splitData = splitDataSet(dataSet, bestFeat, value)
+        myTree[bestFeatLabel][value] = creatTree(splitData, subLabels)
     return myTree
 
-myData,myLabels = creatDataSet()
-myTree = creatTree(myData,myLabels)
-print(myTree)
+# myData,myLabels = creatDataSet()
+# myTree = creatTree(myData,myLabels)
+# print(myTree)
