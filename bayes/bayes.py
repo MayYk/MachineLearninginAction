@@ -126,4 +126,4 @@ def spamTest():
     print('the error rate is:', float(errorCount)/len(testSet))
 
 # testingNB()
-spamTest()
+# spamTest()
