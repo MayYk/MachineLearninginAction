@@ -21,23 +21,31 @@ def createVocabList(dataSet):
         vocabSet = vocabSet | set(document)
     return list(vocabSet)
 
+# 构建词向量的方法，只记录了每个词是否出现，而没有记录词出现的次数，这样的模型叫做词集模型
+# 如果在词向量中记录词出现的次数，没出现一次，则多记录一次，这样的词向量构建方法，被称为词袋模型
+
+# 词集模型
 def setOfWords2Vec(vocabList, inputSet):
     # 创建一个其中所含元素都为0的向量
     returnVec = [0]*len(vocabList)
     for word in inputSet:
-        if word in inputSet:
+        if word in vocabList:
             returnVec[vocabList.index(word)] = 1
         else:
             print('the word: %s is not in my Vocabulary!' % word)
     return returnVec
 
 # 朴素贝叶斯分类器训练函数
+# 难理解：
+# 讲解：https://blog.csdn.net/moxigandashu/article/details/71480251?locationNum=16&fps=1
 def trainNB0(trainMatrix, trainCategory):
     numTrainDocs = len(trainMatrix)
     numWords = len(trainMatrix[0])
     pAbusive = sum(trainCategory) / float(numTrainDocs)
-    p0Num = zeros(numWords);    p1Num = zeros(numWords)
-    p0Denom = 0.0;    p1Denom = 0.0
+    # p0Num = zeros(numWords);    p1Num = zeros(numWords)
+    # p0Denom = 1.0;    p1Denom = 1.0
+    p0Num = ones(numWords);    p1Num = ones(numWords)
+    p0Denom = 2.0;    p1Denom = 2.0
     for i in range(numTrainDocs):
         if trainCategory[i] == 1:
             p1Num += trainMatrix[i]
@@ -45,8 +53,11 @@ def trainNB0(trainMatrix, trainCategory):
         else:
             p0Num += trainMatrix[i]
             p0Denom += sum(trainMatrix[i])
-    p1Vect = p1Num/p1Denom
-    p0Vect = p0Num/p0Denom
+    # p1Vect = p1Num/p1Denom
+    # p0Vect = p0Num/p0Denom
+    # 数值过小，下溢出，取自然对数
+    p1Vect = log(p1Num/p1Denom)
+    p0Vect = log(p0Num/p0Denom)
     return p0Vect, p1Vect, pAbusive
 
 # 朴素贝叶斯分类函数
@@ -125,5 +136,5 @@ def spamTest():
             errorCount += 1
     print('the error rate is:', float(errorCount)/len(testSet))
 
-# testingNB()
+testingNB()
 # spamTest()
