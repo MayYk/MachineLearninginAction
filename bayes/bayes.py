@@ -48,7 +48,10 @@ def trainNB0(trainMatrix, trainCategory):
     p0Denom = 2.0;    p1Denom = 2.0
     for i in range(numTrainDocs):
         if trainCategory[i] == 1:
+            # 统计所有类别为1的词条向量中各个词条出现的次数
             p1Num += trainMatrix[i]
+            # 统计类别为1的词条向量中出现的所有词条的总数
+            # 即统计类1所有文档中出现单词的数目
             p1Denom += sum(trainMatrix[i])
         else:
             p0Num += trainMatrix[i]
