@@ -58,13 +58,37 @@ def localWords(feed1, feed0):
 
     print('the error rate is:', float(errorCount)/len(testSet))
     return vocabList, p0V, p1V
+
+# 最具表征性的词汇显示函数
+def getTopWords(ny, sf):
+    import operator
+    vocabList, p0V, p1V = localWords(ny, sf)
+    topNY = []
+    topSF = []
+    for i in range(len(p0V)):
+        if p0V[i] > -4.5:
+            topSF.append((vocabList[i], p0V[i]))
+        if p1V[i] > -4.5:
+            topNY.append((vocabList[i], p1V[i]))
+
+    sortedSF = sorted(topSF, key=lambda pair:pair[1], reverse=True)
+    print('SF**SF**SF**SF**SF**SF**SF**SF**SF**SF**SF**SF**SF**SF**SF**SF**SF**SF')
+    for item in sortedSF:
+        print(item[0])
+
+    sortedNY = sorted(topNY, key=lambda pair:pair[1], reverse=True)
+    print('NY**NY**NY**NY**NY**NY**NY**NY**NY**NY**NY**NY**NY**NY**NY**NY**NY**NY')
+    for item in sortedNY:
+        print(item[0])
 # 教程链接不可用，修改措施
-# http://brittanyherself.com/cgg/tutorial-how-to-subscribe-to-craigslists-rss-feeds/
+# 修改RSS城市来源：RSS说明：http://brittanyherself.com/cgg/tutorial-how-to-subscribe-to-craigslists-rss-feeds/
+# 或者
+# 更换数据网站来源：http://www.cnblogs.com/femaleprogramer/p/3854970.html
 
 # ny = feedparser.parse('http://newyork.craigslist.org/stp/index.rss')
 # sf = feedparser.parse('http://sybay.craigslist.org/stp/index.rss')
-ny = feedparser.parse('https://newyork.craigslist.org/search/bts?format=rss')
-sf = feedparser.parse('https://syracuse.craigslist.org/search/acc?format=rss')
+ny = feedparser.parse('https://newyork.craigslist.org/search/ats?format=rss')
+sf = feedparser.parse('https://syracuse.craigslist.org/search/ats?format=rss')
 
-vocabList, pSF, pNY = localWords(ny, sf)
-
+# vocabList, pSF, pNY = localWords(ny, sf)
+getTopWords(ny, sf)

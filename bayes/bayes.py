@@ -95,11 +95,18 @@ def bagOfWords2VecMN(vocabList, inputSet):
     return returnVec
 
 # 文件解析
+# 去掉少于两个字符的字符串，并将所有字符串转换为小写
 def textParse(bigString):
     import re
     listOfTokens = re.split(r'\W*', bigString)
-    return [tok.lower for tok in listOfTokens if len(tok) > 2]
-
+    # ss = []
+    # for tok in listOfTokens:
+    #     if len(tok) > 2:
+    #         b = tok.lower()
+    #         ss.append(b)
+    # ss = [tok.lower() for tok in listOfTokens if len(tok) > 2]
+    return [tok.lower() for tok in listOfTokens if len(tok) > 2]
+    # return ss
 # 完整的垃圾邮件测试函数
 def spamTest():
     docList = []; classList = []; fullText = []
@@ -137,7 +144,9 @@ def spamTest():
         wordVector = setOfWords2Vec(vocabList, docList[docIndex])
         if classifyNB(array(wordVector), p0V, p1V, pSpam) != classList[docIndex]:
             errorCount += 1
+    # 错误率很高，原因没查出来
+    # 原因：textParse函数中tok.lower()原来没加括号导致转换失败
     print('the error rate is:', float(errorCount)/len(testSet))
 
-testingNB()
+# testingNB()
 # spamTest()
