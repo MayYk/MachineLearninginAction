@@ -1,7 +1,7 @@
 #!user/bin/env python
 # _*_ coding:utf-8 _*_
 import trees as trees
-import TreePlotter as treePlt
+import treePlotter as treePlt
 
 # 决策树分类函数
 def classify(inputTree, featLabels, testVec):
