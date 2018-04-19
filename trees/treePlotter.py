@@ -95,14 +95,15 @@ def createPlot(inTree):
     plotTree.y0ff = 1.0
     plotTree(inTree, (0.5, 1.0), '')
     plt.show()
+if __name__ == '__main__':
 
-# myTree = retrieveTree(0)
-# print(myTree.keys())
-# numLeaf = getNumLeafs(myTree)
-# treeDepth = getTreeDepth(myTree)
-# print(myTree,numLeaf,treeDepth)
-# createPlot()
+    # myTree = retrieveTree(0)
+    # print(myTree.keys())
+    # numLeaf = getNumLeafs(myTree)
+    # treeDepth = getTreeDepth(myTree)
+    # print(myTree,numLeaf,treeDepth)
+    # createPlot()
 
-myTree = retrieveTree(0)
-myTree['no surfacing'][3] = 'maybe'
-createPlot(myTree)
+    myTree = retrieveTree(0)
+    myTree['no surfacing'][3] = 'maybe'
+    createPlot(myTree)

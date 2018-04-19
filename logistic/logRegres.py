@@ -31,10 +31,6 @@ def gradAscent(dataMatIn, classLabels):
         weights = weights + alpha * dataMatrix.transpose() * error
     return weights
 
-dataArr, labelMat = loadDataSet()
-ab = gradAscent(dataArr, labelMat)
-print(ab)
-
 def plotBestFit(weights):
     import matplotlib.pyplot as plt
     dataMat, labelMat = loadDataSet()
@@ -61,10 +57,6 @@ def plotBestFit(weights):
     plt.xlabel('X1');plt.ylabel('X2')
     plt.show()
 
-# weights = gradAscent(dataArr, labelMat)
-# getsA():将一个numpy矩阵转换为数组
-# plotBestFit(weights.getA())
-
 def stocGradAscent0(dataMatrix, classLabels):
     m,n = shape(dataMatrix)
     alpha = 0.01
@@ -74,8 +66,6 @@ def stocGradAscent0(dataMatrix, classLabels):
         error = classLabels[i] - h
         weights = weights + alpha * error * dataMatrix[i]
     return weights
-# weights = stocGradAscent0(array(dataArr), labelMat)
-# plotBestFit(weights)
 
 def stocGradAscent1(dataMatrix, classLabels, numIter=150):
     m,n = shape(dataMatrix)
@@ -92,8 +82,6 @@ def stocGradAscent1(dataMatrix, classLabels, numIter=150):
             weights = weights + alpha * error * dataMatrix[randIndex]
             del(dataIndex[randIndex])
     return weights
-# weights = stocGradAscent1(array(dataArr), labelMat)
-# plotBestFit(weights)
 
 # 计算对应Sigmoid值
 def classifyVector(inX,weights):
@@ -135,5 +123,19 @@ def multiTest():
     for k in range(numTests):
         errorSum += colicTest()
     print('after %d iterations the average error rate is: %f' % (numTests, errorSum/float(numTests)))
+if __name__ == '__main__':
+    dataArr, labelMat = loadDataSet()
+    ab = gradAscent(dataArr, labelMat)
+    print(ab)
 
-multiTest()
+    # weights = gradAscent(dataArr, labelMat)
+    # getsA():将一个numpy矩阵转换为数组
+    # plotBestFit(weights.getA())
+
+    # weights = stocGradAscent0(array(dataArr), labelMat)
+    # plotBestFit(weights)
+
+    # weights = stocGradAscent1(array(dataArr), labelMat)
+    # plotBestFit(weights)
+
+    multiTest()

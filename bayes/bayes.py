@@ -147,6 +147,6 @@ def spamTest():
     # 错误率很高，原因没查出来
     # 原因：textParse函数中tok.lower()原来没加括号导致转换失败
     print('the error rate is:', float(errorCount)/len(testSet))
-
-# testingNB()
-# spamTest()
+if __name__ == '__main__':
+    testingNB()
+    spamTest()

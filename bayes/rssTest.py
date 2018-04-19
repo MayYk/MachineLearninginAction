@@ -87,8 +87,9 @@ def getTopWords(ny, sf):
 
 # ny = feedparser.parse('http://newyork.craigslist.org/stp/index.rss')
 # sf = feedparser.parse('http://sybay.craigslist.org/stp/index.rss')
-ny = feedparser.parse('https://newyork.craigslist.org/search/ats?format=rss')
-sf = feedparser.parse('https://syracuse.craigslist.org/search/ats?format=rss')
+if __name__ == '__main__':
+    ny = feedparser.parse('https://newyork.craigslist.org/search/ats?format=rss')
+    sf = feedparser.parse('https://syracuse.craigslist.org/search/ats?format=rss')
 
 # vocabList, pSF, pNY = localWords(ny, sf)
-getTopWords(ny, sf)
+    getTopWords(ny, sf)
