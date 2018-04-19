@@ -61,9 +61,9 @@ def plotBestFit(weights):
     plt.xlabel('X1');plt.ylabel('X2')
     plt.show()
 
-weights = gradAscent(dataArr, labelMat)
+# weights = gradAscent(dataArr, labelMat)
 # getsA():将一个numpy矩阵转换为数组
-plotBestFit(weights.getA())
+# plotBestFit(weights.getA())
 
 def stocGradAscent0(dataMatrix, classLabels):
     m,n = shape(dataMatrix)
@@ -74,21 +74,28 @@ def stocGradAscent0(dataMatrix, classLabels):
         error = classLabels[i] - h
         weights = weights + alpha * error * dataMatrix[i]
     return weights
+# weights = stocGradAscent0(array(dataArr), labelMat)
+# plotBestFit(weights)
 
 def stocGradAscent1(dataMatrix, classLabels, numIter=150):
     m,n = shape(dataMatrix)
     weights = ones(n)
     for j in range(numIter):
-        dataIndex = range(m)
+        dataIndex = list(range(m))
         for i in range(m):
+            # alpha每次迭代时需要调整
             alpha = 4/(1.0+j+i)+0.01
+            # 随机选取更新
             randIndex = int(random.uniform(0, len(dataIndex)))
-            h = sigmoid(sum(dataMatrix[randIndex]*weights))
+            h = sigmoid(sum(dataMatrix[randIndex] * weights))
             error = classLabels[randIndex] - h
             weights = weights + alpha * error * dataMatrix[randIndex]
             del(dataIndex[randIndex])
     return weights
+# weights = stocGradAscent1(array(dataArr), labelMat)
+# plotBestFit(weights)
 
+# 计算对应Sigmoid值
 def classifyVector(inX,weights):
     prob = sigmoid(sum(inX * weights))
     if prob > 0.5:
@@ -118,6 +125,7 @@ def colicTest():
             lineArr.append(float(currLine[i]))
         if int(classifyVector(array(lineArr), trainWeights)) != int(currLine[21]):
             lineArr.append(float(errorCount)/numTestVec)
+            errorCount += 1
     errorRate = (float(errorCount)/numTestVec)
     print('the error rate of this test is: %f' % errorRate)
     return errorRate
@@ -128,3 +136,4 @@ def multiTest():
         errorSum += colicTest()
     print('after %d iterations the average error rate is: %f' % (numTests, errorSum/float(numTests)))
 
+multiTest()
