@@ -15,6 +15,7 @@ def loadDataSet():
 def sigmoid(inX):
     return 1.0/(1 + exp(-inX))
 
+# 回归梯度上升优化算法
 def gradAscent(dataMatIn, classLabels):
     dataMatrix = mat(dataMatIn)
     labelMat = mat(classLabels).transpose()
@@ -31,6 +32,7 @@ def gradAscent(dataMatIn, classLabels):
         weights = weights + alpha * dataMatrix.transpose() * error
     return weights
 
+# 画数据集和Logitsic回归最佳拟合直线的函数
 def plotBestFit(weights):
     import matplotlib.pyplot as plt
     dataMat, labelMat = loadDataSet()
@@ -57,6 +59,7 @@ def plotBestFit(weights):
     plt.xlabel('X1');plt.ylabel('X2')
     plt.show()
 
+# 随机梯度上升算法
 def stocGradAscent0(dataMatrix, classLabels):
     m,n = shape(dataMatrix)
     alpha = 0.01
@@ -67,6 +70,7 @@ def stocGradAscent0(dataMatrix, classLabels):
         weights = weights + alpha * error * dataMatrix[i]
     return weights
 
+# 改进的随机梯度上升算法
 def stocGradAscent1(dataMatrix, classLabels, numIter=150):
     m,n = shape(dataMatrix)
     weights = ones(n)
