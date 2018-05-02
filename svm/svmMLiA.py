@@ -37,7 +37,6 @@ def clipAlpha(aj, H, L):
         aj = L
     return aj
 
-
 def smoSimple(dataMatIn, classLabels, C, toler, maxIter):
     """
 
@@ -51,7 +50,8 @@ def smoSimple(dataMatIn, classLabels, C, toler, maxIter):
     dataMatrix = mat(dataMatIn)
     labelMat = mat(classLabels).transpose()
 
-    b = 0; m,n = shape(dataMatrix)
+    b = 0
+    m,n = shape(dataMatrix)
     alphas = mat(zeros((m, 1)))
     # 在没有任何alpha改变的情况下遍历数据集的次数
     # 该变量达到输入值maxIter时，函数结束运行并退出
@@ -88,7 +88,7 @@ def smoSimple(dataMatIn, classLabels, C, toler, maxIter):
                     continue
                 alphas[j] -= labelMat[j] * (Ei - Ej)/eta
                 alphas[j] = clipAlpha(alphas[j], H, L)
-                if (abs(alphas[j] - alphaJold) < 0.00001):
+                if abs(alphas[j] - alphaJold) < 0.00001:
                     print('j not moving enough')
                     continue
                 # 相反方向修改alphas[i]，改变的大小一样
@@ -104,7 +104,7 @@ def smoSimple(dataMatIn, classLabels, C, toler, maxIter):
                     b = (b1 + b2)/2.0
                 alphaPairsChanged += 1
                 print('iter: %d i:%d, pairs changed %d' % (iter, i, alphaPairsChanged))
-        if (alphaPairsChanged == 0):
+        if alphaPairsChanged == 0:
             iter += 1
         else:
             iter = 0
@@ -129,7 +129,9 @@ def calcEk(oS, k):
     return Ek
 
 def selectJ(i, oS, Ei):
-    maxK = -1; maxDeltaE = 0; Ej = 0;
+    maxK = -1
+    maxDeltaE = 0
+    Ej = 0
     oS.eCache[i] = [1, Ei]
     validEcacheList = nonzero(oS.eCache[:, 0].A)[0]
     if (len(validEcacheList)) > 1:
@@ -139,9 +141,9 @@ def selectJ(i, oS, Ei):
             Ek = calcEk(oS, k)
             deltaE = abs(Ei - Ek)
             # 选择有最大步长的j
-            if (deltaE > maxDeltaE):
+            if deltaE > maxDeltaE:
                 maxK = k
-                maxDeltaE = deltaE;
+                maxDeltaE = deltaE
                 Ej = Ek
         return maxK, Ej
     else:
@@ -159,7 +161,7 @@ def innerL(i, oS):
         j, Ej = selectJ(i, oS, Ei)
         alphaIold = oS.alphas[i].copy()
         alphaJold = oS.alphas[j].copy()
-        if(oS.labelMat[i] != oS.labelMat[j]):
+        if oS.labelMat[i] != oS.labelMat[j]:
             L = max(0, oS.alphas[j] - oS.alphas[i])
             H = min(oS.C, oS.C + oS.alphas[j] - oS.alphas[i])
         else:
@@ -176,13 +178,14 @@ def innerL(i, oS):
         oS.alphas[j] = clipAlpha(oS.alphas[j], H, L)
         # 更新误差缓存
         updateEk(oS, j)
-        if (abs(oS.alphas[j] - alphaJold) < 0.00001):
+        if abs(oS.alphas[j] - alphaJold) < 0.00001:
             print('j not moving enough')
             return 0
         oS.alphas[i] += oS.labelMat[j] * oS.labelMat[i] * (alphaJold - oS.alphas[j])
         updateEk(oS, i)
         b1 = oS.b - Ei - oS.labelMat[i] * (oS.alphas[i] - alphaIold) * oS.K[i, i] - oS.labelMat[j] * (oS.alphas[j] - alphaJold) * oS.K[i, j]
         b2 = oS.b - Ej - oS.labelMat[i] * (oS.alphas[i] - alphaIold) * oS.K[i, j] - oS.labelMat[j] * (oS.alphas[j] - alphaJold) * oS.K[j, j]
+
         if (0 < oS.alphas[i]) and (oS.C > oS.alphas[i]):
             oS.b = b1
         elif (0 < oS.alphas[j]) and (oS.C > oS.alphas[j]):
@@ -199,7 +202,7 @@ def smoP(dataMatIn, classLabels, C, toler, maxIter, kTup=('lin', 0)):
     entireSet = True
     alphaPairsChanged = 0
     # 迭代次数超过指定最大值，或者遍历整个集合都未对任意alpha对进行修改时，就退出循环
-    while (iter < maxIter) and ((alphaPairsChanged > 0) or (entireSet)):
+    while iter < maxIter and (alphaPairsChanged > 0 or entireSet):
         alphaPairsChanged = 0
         if entireSet:
             # 遍历所有的值
@@ -216,7 +219,7 @@ def smoP(dataMatIn, classLabels, C, toler, maxIter, kTup=('lin', 0)):
             iter += 1
         if entireSet:
             entireSet = False  # toggle entire set loop
-        elif (alphaPairsChanged == 0):
+        elif alphaPairsChanged == 0:
             entireSet = True
         print('iteration number: %d' % iter)
     return oS.b, oS.alphas
@@ -230,11 +233,9 @@ def calcWs(alphas, dataArr, classLabels):
         w += multiply(alphas[i] * labelMat[i], X[i,:].T)
     return w
 
-
-
 if __name__ == '__main__':
     dataArr, labelArr = loadDataSet('testSet.txt')
     print(labelArr)
     # b, alphas = smoSimple(dataArr, labelArr, 0.6, 0.001, 40)
-    b, alphas = smoP(dataArr, labelArr, 0.6, 0.001, 40)
+    b, alphas = smoP(dataArr,labelArr, 0.6, 0.001, 40)
     pass
