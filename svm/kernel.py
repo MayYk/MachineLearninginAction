@@ -7,8 +7,11 @@ import svmMLiA as svm
 def kernelTrans(X, A, kTup):
     m,n = shape(X)
     K = mat(zeros((m, 1)))
+    # 如果核函数类型为'lin'
     if kTup[0] == 'lin':
         K = X * A.T
+    # 如果核函数类型为'rbf':径向基核函数
+    # 将每个样本向量利用核函数转为高维空间
     elif kTup[0] == 'rbf':
         for j in range(m):
             deltaRow = X[j,:] - A
@@ -21,6 +24,15 @@ def kernelTrans(X, A, kTup):
 
 class optStruct1:
     def __init__(self, dataMatIn, classLabels, C, toler, kTup):
+        """
+
+        :param dataMatIn:
+        :param classLabels:
+        :param C:
+        :param toler:
+        :param kTup: kTup是一个包含核信息的元组，它提供了选取的核函数的类型，比如线性'lin'或者径向基核函数'rbf'
+        以及用户提供的到达率σ
+        """
         self.X = dataMatIn
         self.labelMat = classLabels
         self.C = C
@@ -98,6 +110,7 @@ def testRbf(k1 = 1.3):
         predict = kernelEval.T * multiply(labelSV, alphas[svInd]) + b
         if sign(predict) != sign(labelArr[i]): errorCount += 1
     print('the training error rate is: %f' % (float(errorCount) / m))
+
     dataArr, labelArr = svm.loadDataSet('testSetRBF2.txt')
     errorCount = 0
     datMat = mat(dataArr)
@@ -154,6 +167,7 @@ def testDigits(kTup = ('rbf', 10)):
         if sign(predict) != sign(labelArr[i]):
             errCount += 1
     print('the training error rate is: %f' % (float(errCount)/m))
+
     dataArr, labelArr = loadImage('testDigits')
     errCount = 0
     datMat = mat(dataArr)
@@ -167,5 +181,5 @@ def testDigits(kTup = ('rbf', 10)):
     print('the test error rate is: %f' % (float(errCount)/m))
 
 if __name__ == '__main__':
-    # testRbf()
-    testDigits(('rbf', 20))
+    testRbf()
+    # testDigits(('rbf', 20))
