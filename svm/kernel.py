@@ -94,7 +94,7 @@ def calcEkK(oS, k):
     return Ek
 
 # 在测试中使用核函数
-def testRbf(k1 = 1.3):
+def testRbf(k1 = 0.1):
     dataArr, labelArr = svm.loadDataSet('testSetRBF.txt')
     b, alphas = svm.smoP(dataArr, labelArr, 200, 0.0001, 10000, ('rbf', k1))
     datMat = mat(dataArr)
