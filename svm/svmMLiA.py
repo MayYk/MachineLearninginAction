@@ -180,7 +180,6 @@ def updateEk(oS, k):
     Ek = calcEk(oS, k)
     oS.eCache[k] = [1, Ek]
 
-
 # 完整版
 # 启发式选择变量
 # https://blog.csdn.net/luoshixian099/article/details/51227754
@@ -189,10 +188,14 @@ def innerL(i, oS):
     # 计算误差
     Ei = calcEk(oS, i)
     # 违背kkt条件
+    # 如果标签与误差相乘之后在容错范围之外，且超过各自对应的常数值，则进行优化
     if ((oS.labelMat[i] * Ei < -oS.tol) and (oS.alphas[i] < oS.C)) or ((oS.labelMat[i] * Ei > oS.tol) and (oS.alphas[i] > 0)):
+        # 启发式选择第二个alpha值
         j, Ej = selectJ(i, oS, Ei)
+        # 利用copy存储刚才的计算值，便于后期比较
         alphaIold = oS.alphas[i].copy()
         alphaJold = oS.alphas[j].copy()
+        # 保证alpha在0和C之间
         if oS.labelMat[i] != oS.labelMat[j]:
             L = max(0, oS.alphas[j] - oS.alphas[i])
             H = min(oS.C, oS.C + oS.alphas[j] - oS.alphas[i])
@@ -207,17 +210,19 @@ def innerL(i, oS):
             print('eta>=0')
             return 0
         oS.alphas[j] -= oS.labelMat[j] * (Ei - Ej) / eta
+        # 对新的alphas[j]进行阈值处理
         oS.alphas[j] = clipAlpha(oS.alphas[j], H, L)
         # 更新误差缓存
         updateEk(oS, j)
         if abs(oS.alphas[j] - alphaJold) < 0.00001:
             print('j not moving enough')
             return 0
+        # 对i进行修改，修改量相同，但是方向相反
         oS.alphas[i] += oS.labelMat[j] * oS.labelMat[i] * (alphaJold - oS.alphas[j])
         updateEk(oS, i)
         b1 = oS.b - Ei - oS.labelMat[i] * (oS.alphas[i] - alphaIold) * oS.X[i, :] * oS.X[i, :].T - oS.labelMat[j] * (oS.alphas[j] - alphaJold) * oS.X[i,:] * oS.X[j, :].T
         b2 = oS.b - Ej - oS.labelMat[i] * (oS.alphas[i] - alphaIold) * oS.X[i, :] * oS.X[i, :].T - oS.labelMat[j] * (oS.alphas[j] - alphaJold) * oS.X[j,:] * oS.X[j, :].T
-
+        # 谁在0到C之间，就听谁的，否则就取平均值
         if (0 < oS.alphas[i]) and (oS.C > oS.alphas[i]):
             oS.b = b1
         elif (0 < oS.alphas[j]) and (oS.C > oS.alphas[j]):
@@ -239,7 +244,7 @@ def smoP(dataMatIn, classLabels, C, toler, maxIter, kTup=('lin', 0)):
     alphaPairsChanged = 0
     # 迭代次数超过指定最大值，或者遍历整个集合都未对任意alpha对进行修改时，就退出循环
     # 选取第一个变量alpha的三种情况，从间隔边界上选取或者整个数据集
-    while iter < maxIter and (alphaPairsChanged > 0 or entireSet):
+    while(iter < maxIter) and (alphaPairsChanged > 0 or entireSet):
         alphaPairsChanged = 0
         # 没有alpha更新对
         if entireSet:
