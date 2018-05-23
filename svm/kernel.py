@@ -105,11 +105,11 @@ def innerLL(i, oS):
             L = max(0, oS.alphas[j] + oS.alphas[i] -oS.C)
             H = min(oS.C, oS.alphas[j] + oS.alphas[i])
         if L == H:
-            print('L==H')
+            # print('L==H')
             return 0
         eta = 2.0 * oS.K[i, j] - oS.K[i, i] - oS.K[j, j]
         if eta >= 0:
-            print('eta>=0')
+            # print('eta>=0')
             return 0
         oS.alphas[j] -= oS.labelMat[j] * (Ei - Ej) / eta
         # 对新的alphas[j]进行阈值处理
@@ -118,7 +118,7 @@ def innerLL(i, oS):
         updateEkK(oS, j)
         # 如果新旧值差很小，则不做处理跳出本次循环
         if (abs(oS.alphas[j] - alphaJold) < 0.00001):
-            print('j not moving enough')
+            # print('j not moving enough')
             return 0
         # 对i进行修改，修改量相同，但是方向相反
         oS.alphas[i] += oS.labelMat[j] * oS.labelMat[i] * (alphaJold - oS.alphas[j])
@@ -138,8 +138,9 @@ def innerLL(i, oS):
     else:
         return 0
 
+# 注意这里公式的变化
 def calcEkK(oS, k):
-    fXk = float(multiply(oS.alphas,oS.labelMat).T*(oS.X*oS.X[k,:].T) + oS.b)
+    fXk = float(multiply(oS.alphas,oS.labelMat).T*oS.K[:,k] + oS.b)
     Ek = fXk - float(oS.labelMat[k])
     return Ek
 
@@ -275,7 +276,7 @@ def smoPP(dataMatIn, classLabels, C, toler, maxIter, kTup=('lin', 0)):
     return oS.b, oS.alphas
 
 if __name__ == '__main__':
-    # testRbf()
-    # for i in range(1,100,10):
-    #     print("i=%d" % (i))
-        testDigits(('rbf', 10))
+    # testRbf(0.1)
+    for i in range(1,100,10):
+        print("i=%d" % (i))
+        testDigits(('rbf', i))
