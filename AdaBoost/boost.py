@@ -78,7 +78,7 @@ def buildStump(dataArr, classLabels, D):
                 # 将errArr向量和权重向量D的相应元素相乘并求和，得到数值weightedError
                 # AdaBoost和分类器交互的地方
                 weightedError = D.T * errArr
-                print('split: dim %d, thresh %.2f, thresh ineqal: %s, the weighted error is %.3f' % (i, threshVal, inequal, weightedError))
+                # print('split: dim %d, thresh %.2f, thresh ineqal: %s, the weighted error is %.3f' % (i, threshVal, inequal, weightedError))
 
                 # 将当前的错误率与已有的最小错误率进行对比，如果当前的值较小，那么就在词典bestStump中保存该单层决策树
                 if weightedError < minError:
@@ -184,20 +184,24 @@ def plotROC(predStrengths, classLabels):
     print('the Area Under the Curve is: ', ySum * xStep)
 
 if __name__ == '__main__':
-    dataMat,classLabels = loadSimpData()
+    # dataMat,classLabels = loadSimpData()
     # createPlot(dataMat, classLabels)
     # D = mat(ones((5, 1)) / 5)
-    buildStump(dataMat, classLabels, D)
+    # buildStump(dataMat, classLabels, D)
     # DS：decision stump（单层决策树）
     # adaBoostTrainsDS(dataMat, classLabels, 9)
 
     # classifierArr = adaBoostTrainsDS(dataMat, classLabels, 30)
-    # adaClassify([0,0], classifierArr)
-    # dataArr, labelArr = loadDataSet('horseColicTraining2.txt')
-    # classifierArray = adaBoostTrainsDS(dataArr, labelArr, 10)
+    # print(classifierArr)
+    # lab = adaClassify([0, 0], classifierArr)
+    # lab2 = adaClassify([[5, 5], [0, 0]], classifierArr)
+    # print(lab2)
 
-    # classifierArray, aggClassEst = adaBoostTrainsDS(dataArr, labelArr, 10)
-    # plotROC(aggClassEst.T, labelArr)
+    dataArr, labelArr = loadDataSet('horseColicTraining2.txt')
+    classifierArray = adaBoostTrainsDS(dataArr, labelArr, 10)
+
+    classifierArray, aggClassEst = adaBoostTrainsDS(dataArr, labelArr, 10)
+    plotROC(aggClassEst.T, labelArr)
 
     # testArr, testLabelArr = loadDataSet('horseColicTest2.txt')
     # prediction10 = adaClassify(testArr, classifierArray)
