@@ -58,6 +58,24 @@ def lwlrTest(testArr, xArr, yArr, k=1.0):
         yHat[i] = lwlr(testArr[i], xArr, yArr, k)
     return yHat
 
+def plotStandRegres(xArr,yArr):
+    ws = standRegres(xArr, yArr)
+    print(ws)
+
+    xMat = mat(xArr)
+    yMat = mat(yArr)
+    yHat = xMat * ws
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    # flatten：用于array和mat的降维
+    ax.scatter(xMat[:,1].flatten().A[0], yMat.T[:,0].flatten().A[0])
+    xCopy = xMat.copy()
+    xCopy.sort(0)
+    yHat = xCopy * ws
+    ax.plot(xCopy[:,1],yHat)
+    plt.show()
+
 def plotLwlr(xArr, yArr):
     yHat_0 = lwlrTest(xArr, xArr, yArr, 1.0)
     yHat_1 = lwlrTest(xArr, xArr, yArr, 0.01)
@@ -90,22 +108,7 @@ def plotLwlr(xArr, yArr):
 if __name__ == '__main__':
     xArr, yArr = loadDataSet('ex0.txt')
     # print(xArr[0:2])
-    # ws = standRegres(xArr, yArr)
-    # print(ws)
-    #
-    # xMat = mat(xArr)
-    # yMat = mat(yArr)
-    # yHat = xMat * ws
-    #
-    # fig = plt.figure()
-    # ax = fig.add_subplot(111)
-    # flatten：用于array和mat的降维
-    # ax.scatter(xMat[:,1].flatten().A[0], yMat.T[:,0].flatten().A[0])
-    # xCopy = xMat.copy()
-    # xCopy.sort(0)
-    # yHat = xCopy * ws
-    # ax.plot(xCopy[:,1],yHat)
-    # plt.show()
+    # plotStandRegres(xArr,yArr)
 
     # lwlr(xArr[0], xArr, yArr, 1.0)
     # lwlr(xArr[0], xArr, yArr, 0.001)
