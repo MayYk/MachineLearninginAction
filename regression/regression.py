@@ -87,7 +87,8 @@ def plotLwlr(xArr, yArr):
     srtInd = xMat[:,1].argsort(0)
     xSort = xMat[srtInd][:,0,:]
     # 中文显示的bug
-    font = FontProperties(fname=r"c:\windows\fonts\simsun.ttc", size=14)
+    # font = FontProperties(fname=r"c:\windows\fonts\simsun.ttc", size=14)
+
     fig, axs = plt.subplots(nrows=3, ncols=1, sharex=False, sharey=False, figsize=(10, 8))
     axs[0].plot(xSort[:, 1], yHat_0[srtInd], c='red')  # 绘制回归曲线
     axs[1].plot(xSort[:, 1], yHat_1[srtInd], c='red')  # 绘制回归曲线
@@ -96,9 +97,9 @@ def plotLwlr(xArr, yArr):
     axs[1].scatter(xMat[:, 1].flatten().A[0], yMat.flatten().A[0], s=20, c='blue', alpha=.5)  # 绘制样本点
     axs[2].scatter(xMat[:, 1].flatten().A[0], yMat.flatten().A[0], s=20, c='blue', alpha=.5)
     #设置标题,x轴label,y轴label
-    axs0_title_text = axs[0].set_title(u'k=1.0',FontProperties=font)
-    axs1_title_text = axs[1].set_title(u'k=0.01',FontProperties=font)
-    axs2_title_text = axs[2].set_title(u'k=0.003',FontProperties=font)
+    axs0_title_text = axs[0].set_title('k=1.0')
+    axs1_title_text = axs[1].set_title('k=0.01')
+    axs2_title_text = axs[2].set_title('k=0.003')
     plt.setp(axs0_title_text, size=8, weight='bold', color='red')
     plt.setp(axs1_title_text, size=8, weight='bold', color='red')
     plt.setp(axs2_title_text, size=8, weight='bold', color='red')
@@ -113,4 +114,3 @@ if __name__ == '__main__':
     # lwlr(xArr[0], xArr, yArr, 1.0)
     # lwlr(xArr[0], xArr, yArr, 0.001)
     plotLwlr(xArr,yArr)
-
