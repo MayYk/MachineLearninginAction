@@ -106,6 +106,29 @@ def plotLwlr(xArr, yArr):
     plt.xlabel('X')
     plt.show()
 
+def rssError(yArr, yHatArr):
+    su = ((yArr - yHatArr)**2).sum()
+    print(su)
+    return su
+
+def agePredict1():
+    abX,abY = loadDataSet('abalone.txt')
+    yHat01 = lwlrTest(abX[0:99], abX[0:99], abY[0:99], 0.1)
+    yHat1 = lwlrTest(abX[0:99], abX[0:99], abY[0:99], 1)
+    yHat10 = lwlrTest(abX[0:99], abX[0:99], abY[0:99], 10)
+    rssError(abY[0:99], yHat01.T)
+    rssError(abY[0:99], yHat1.T)
+    rssError(abY[0:99], yHat10.T)
+
+def agePredict2():
+    abX,abY = loadDataSet('abalone.txt')
+    yHat01 = lwlrTest(abX[100:199], abX[0:99], abY[0:99], 0.1)
+    yHat1 = lwlrTest(abX[100:199], abX[0:99], abY[0:99], 1)
+    yHat10 = lwlrTest(abX[100:199], abX[0:99], abY[0:99], 10)
+    rssError(abY[100:199], yHat01.T)
+    rssError(abY[100:199], yHat1.T)
+    rssError(abY[100:199], yHat10.T)
+
 if __name__ == '__main__':
     xArr, yArr = loadDataSet('ex0.txt')
     # print(xArr[0:2])
@@ -113,4 +136,6 @@ if __name__ == '__main__':
 
     # lwlr(xArr[0], xArr, yArr, 1.0)
     # lwlr(xArr[0], xArr, yArr, 0.001)
-    plotLwlr(xArr,yArr)
+    # plotLwlr(xArr,yArr)
+    # agePredict1()
+    agePredict2()
