@@ -129,6 +129,94 @@ def agePredict2():
     rssError(abY[100:199], yHat1.T)
     rssError(abY[100:199], yHat10.T)
 
+def regularize(xMat):#regularize by columns
+    inMat = xMat.copy()
+    inMeans = mean(inMat,0)   #calc mean then subtract it off
+    inVar = var(inMat,0)      #calc variance of Xi then divide by it
+    inMat = (inMat - inMeans)/inVar
+    return inMat
+
+# 岭回归
+# 计算回归系数
+def ridgeRegres(xMat, yMat, lam =0.2):
+    xTx = xMat.T * xMat
+    denom = xTx + eye(shape(xMat)[1]) * lam
+    if linalg.det(denom) == 0.0:
+        print("This matrix is singular,cannot do inverse")
+        return
+    ws = denom.I * (xMat.T * yMat)
+    return ws
+# 在一组λ上测试结果
+def ridgeTest(xArr, yArr):
+    xMat = mat(xArr)
+    yMat = mat(yArr).T
+    # mean 求平均
+    yMean = mean(yMat, 0)
+    # 数据标准化
+    yMat = yMat - yMean
+    xMat = regularize(xMat)
+
+    numTestPts = 30
+    wMat = zeros((numTestPts, shape(xMat)[1]))
+    for i in range(numTestPts):
+        ws = ridgeRegres(xMat, yMat, exp(i-10))
+        wMat[i, :] = ws.T
+    return wMat
+# 岭回归画图
+def ridgeTestPlot():
+    abX, abY = loadDataSet('abalone.txt')
+    ridgeWeights = ridgeTest(abX, abY)
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.plot(ridgeWeights)
+    plt.show()
+
+# 前向逐步回归
+def stageWise(xArr, yArr, eps=0.01, numIt=100):
+    """
+
+    :param xArr:
+    :param yArr:
+    :param eps:     每次迭代需要调整的步长
+    :param numIt:   优化过程需要迭代的次数
+    :return:
+    """
+    xMat = mat(xArr)
+    yMat = mat(yArr).T
+    yMean = mean(yMat, 0)
+    yMat = yMat - yMean
+    xMat = regularize(xMat)
+    m,n = shape(xMat)
+    returnMat = zeros((numIt, n))
+    ws = zeros((n, 1))
+    wsTest = ws.copy()
+    wsMax = ws.copy()
+    for i in range(numIt):
+        print(ws.T)
+        lowestError = inf
+        for j in range(n):
+            for sign in [-1, 1]:
+                wsTest = ws.copy()
+                wsTest[j] += eps * sign
+                yTest = xMat * wsTest
+                rssE = rssError(yMat.A, yTest.A)
+                if rssE < lowestError:
+                    lowestError = rssE
+                    wsMax = wsTest
+        ws = wsMax.copy()
+        returnMat[i,:] = ws.T
+    return returnMat
+
+def plotStageWise():
+    abX, abY = loadDataSet('abalone.txt')
+    returnMat = stageWise(abX, abY,0.001,5000)
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.plot(returnMat)
+    plt.show()
+
 if __name__ == '__main__':
     xArr, yArr = loadDataSet('ex0.txt')
     # print(xArr[0:2])
@@ -138,4 +226,6 @@ if __name__ == '__main__':
     # lwlr(xArr[0], xArr, yArr, 0.001)
     # plotLwlr(xArr,yArr)
     # agePredict1()
-    agePredict2()
+    # agePredict2()
+    ridgeTestPlot()
+    plotStageWise()
