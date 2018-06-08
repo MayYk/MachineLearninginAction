@@ -217,8 +217,167 @@ def plotStageWise():
     ax.plot(returnMat)
     plt.show()
 
+# 书中代码api已被弃置，从网上找到原有数据集
+# http://code.google.com/apis/shopping/search/v1/getting_started.html
+from time import sleep
+import json
+from urllib.request import urlopen
+from bs4 import BeautifulSoup
+def searchForSet(retX, retY, setNum, yr, numPce, origPrc):
+    # 防止短时间过多API调用，许多网站还有防爬虫机制
+    sleep(10)
+    myAPIstr = 'get from code.google.com'
+    searchURL = 'https://www.googleapis.com/shopping/search/v1/public/prodects?key=%s&country=US&q=lego+%d&alt=json'%(myAPIstr, setNum)
+
+    # TODO python3改版，原有方法存在问题，原有api被弃置，暂时未验证
+    # 这里url编码可能存在问题，留待后续学习爬虫时解决
+    pg = urlopen(searchURL)
+    retDict = json.load(pg.read())
+    for i in range(len(retDict['items'])):
+        try:
+            currItem = retDict['items'][i]
+            if currItem['product']['condition'] == 'new':
+                newFlag = 1
+            else:
+                newFlag = 0
+            listOfInv = currItem['product']['inventories']
+            for item in listOfInv:
+                sellingPrice = item['price']
+                if sellingPrice > origPrc * 0.5:
+                    print("%d\t%d\t%d\t%f\t%f" % (yr,numPce,newFlag,origPrc,sellingPrice))
+                    retX.append([yr, numPce, newFlag, origPrc])
+                    retY.append(sellingPrice)
+        except:
+            print("problem with item %d" % i)
+
+# 网上搬的代码，进行页面的数据解析
+def scrapePage(retX, retY, inFile, yr, numPce, origPrc):
+    """
+    函数说明:从页面读取数据，生成retX和retY列表
+    Parameters:
+        retX - 数据X
+        retY - 数据Y
+        inFile - HTML文件
+        yr - 年份
+        numPce - 乐高部件数目
+        origPrc - 原价
+    Returns:
+        无
+    Website:
+        http://www.cuijiahua.com/
+    Modify:
+        2017-12-03
+    """
+    # 打开并读取HTML文件
+    opFile = 'lego/lego%s.html' % inFile
+    with open(opFile, encoding='utf-8') as f:
+        html = f.read()
+    soup = BeautifulSoup(html)
+
+    i = 1
+    # 根据HTML页面结构进行解析
+    currentRow = soup.find_all('table', r = "%d" % i)
+
+    while(len(currentRow) != 0):
+        currentRow = soup.find_all('table', r = "%d" % i)
+        title = currentRow[0].find_all('a')[1].text
+        lwrTitle = title.lower()
+        # 查找是否有全新标签
+        if (lwrTitle.find('new') > -1) or (lwrTitle.find('nisb') > -1):
+            newFlag = 1.0
+        else:
+            newFlag = 0.0
+
+        # 查找是否已经标志出售，我们只收集已出售的数据
+        soldUnicde = currentRow[0].find_all('td')[3].find_all('span')
+        if len(soldUnicde) == 0:
+            # print("商品 #%d 没有出售" % i)
+            pass
+        else:
+            # 解析页面获取当前价格
+            soldPrice = currentRow[0].find_all('td')[4]
+            priceStr = soldPrice.text
+            priceStr = priceStr.replace('$','')
+            priceStr = priceStr.replace(',','')
+            if len(soldPrice) > 1:
+                priceStr = priceStr.replace('Free shipping', '')
+            sellingPrice = float(priceStr)
+
+            # 去掉不完整的套装价格
+            if  sellingPrice > origPrc * 0.5:
+                # print("%d\t%d\t%d\t%f\t%f" % (yr, numPce, newFlag, origPrc, sellingPrice))
+                retX.append([yr, numPce, newFlag, origPrc])
+                retY.append(sellingPrice)
+        i += 1
+        currentRow = soup.find_all('table', r = "%d" % i)
+
+def buildModel(lgX,lgY):
+    m,n = shape(lgX)
+    lgX1 = mat(ones(m, n+1))
+    lgX1[:,1:5] = mat(lgX)
+
+    ws = standRegres(lgX1,lgX)
+    s1 = lgX1[0] * ws
+    s2 = lgX1[-1] * ws
+    s3 = lgX1[43] * ws
+
+def crossValidation(xArr, yArr, numVal=10):
+    m =len(yArr)
+    indexList = list(range(m))
+    errorMat = zeros((numVal, 30))
+    for i in range(numVal):
+        trainX = []
+        trainY = []
+        testX = []
+        testY = []
+        # 将序列所有元素随机排序
+        random.shuffle(indexList)
+        for j in range(m):
+            if j < m*0.9:
+                trainX.append(xArr[indexList[j]])
+                trainY.append(yArr[indexList[j]])
+            else:
+                testX.append(xArr[indexList[j]])
+                testY.append(yArr[indexList[j]])
+        wMat = ridgeTest(trainX, trainY)
+        for k in range(30):
+            matTestX = mat(testX)
+            matTrainX = mat(trainX)
+            meanTrain = mean(matTrainX, 0)
+            varTrain = var(matTrainX, 0)
+            matTestX = (matTestX - meanTrain)/varTrain
+            yEst = matTestX * mat(wMat[k,:]).T + mean(trainY)
+            errorMat[i,k] = rssError(yEst.T.A, array(testY))
+    meanErrors = mean(errorMat, 0)
+    minMean = float(min(meanErrors))
+    bestWeights = wMat[nonzero(meanErrors == minMean)]
+
+    xMat = mat(xArr)
+    yMat = mat(yArr).T
+    meanX = mean(xMat, 0)
+    varX = var(xMat, 0)
+    unReg = bestWeights/varX
+    print("the best model from Ridge Regression is:\n",unReg)
+    print("with constant term:", -1 * sum(multiply(meanX, unReg)) + mean(yMat))
+
+
+def legoDataTest():
+    lgX = []
+    lgY = []
+    scrapePage(lgX,lgY,8288,2006,800,49.99)
+    scrapePage(lgX,lgY,10030,2002,3096,269.99)
+    scrapePage(lgX,lgY,10179,2007,5195,499.99)
+    scrapePage(lgX,lgY,10181,2007,3428,199.99)
+    scrapePage(lgX,lgY,10189,2008,5922,299.99)
+    scrapePage(lgX,lgY,10196,2009,3263,249.99)
+    print("----------------")
+    print(lgX)
+    print(lgY)
+    print("----------------")
+    crossValidation(lgX, lgY, 10)
+
 if __name__ == '__main__':
-    xArr, yArr = loadDataSet('ex0.txt')
+    # xArr, yArr = loadDataSet('ex0.txt')
     # print(xArr[0:2])
     # plotStandRegres(xArr,yArr)
 
@@ -227,5 +386,6 @@ if __name__ == '__main__':
     # plotLwlr(xArr,yArr)
     # agePredict1()
     # agePredict2()
-    ridgeTestPlot()
-    plotStageWise()
+    # ridgeTestPlot()
+    # plotStageWise()
+    legoDataTest()
