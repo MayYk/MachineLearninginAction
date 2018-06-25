@@ -127,15 +127,15 @@ def prune(tree, testData):
 # 将数据集格式化成目标变量Y和自变量X
 def linearSolve(dataSet):
     m,n = shape(dataSet)
-    X = mat(ones(m,n))
-    Y = mat(ones(m,1))
+    X = mat(ones((m,n)))
+    Y = mat(ones((m,1)))
     # X与Y数据格式化
     X[:,1:n] = dataSet[:,0:n-1]
     Y = dataSet[:, -1]
     xTx = X.T * X
     if linalg.det(xTx) == 0.0:
         raise NameError('This matrix is singular, cannot do inverse,\n try increasing the second value of ops')
-    ws = xTx * (X.T * Y)
+    ws = xTx.I * (X.T * Y)
     return ws, X, Y
 
 # 当数据不再需要切分的时候生成叶节点的模型
@@ -149,10 +149,40 @@ def modelErr(dataSet):
     yHat = X * ws
     return sum(power(Y - yHat, 2))
 
-def cart():
-    myDat = loadDataSet('ex00.txt')
-    myMat = mat(myDat)
-    createTree(myMat)
+#用树回归进行预测
+#1-回归树
+def regTreeEval(model, inDat):
+    return float(model)
+#2-模型树
+def modelTreeEval(model, inDat):
+    n = shape(inDat)[1]
+    X = mat(ones((1, n+1)))
+    X[:, 1:n+1] =inDat
+    return float(X * model)
+
+# 对于输入的单个数据点，treeForeCast返回一个预测值。
+def treeForeCast(tree, inData, modelEval = regTreeEval):
+    if not isTree(tree):
+        return modelEval(tree, inData)
+    if inData[tree['spInd']] > tree['spVal']:
+        if isTree(tree['left']):
+            return treeForeCast(tree['left'], inData, modelEval)
+        else:
+            return modelEval(tree['left'], inData)
+    else:
+        if isTree(tree['right']):
+            return treeForeCast(tree['right'], inData, modelEval)
+        else:
+            return modelEval(tree['right'], inData)
+
+#对数据进行树结构建模
+# 以向量形式返回预测值
+def createForeCast(tree, testData, modelEval = regTreeEval):
+    m = len(testData)
+    yHat = mat(zeros((m,1)))
+    for i in range(m):
+        yHat[i,0] = treeForeCast(tree, mat(testData[i]), modelEval)
+    return yHat
 
 def plotCart():
     myDat1 = loadDataSet('ex0.txt')
@@ -176,14 +206,39 @@ def plotCart():
     plt.show()
 
 def plotLine():
-    myDat = loadDataSet('ex0.txt')
+    myDat = loadDataSet('exp2.txt')
     myMat = mat(myDat)
     myTree = createTree(myMat, ops = (0,1))
     prune(myTree, myMat)
     plt.plot(myMat[:,0], myMat[:,1],'ro')
     plt.show()
 
+def plotBikeSpeedVsIq():
+    myTrainDat = loadDataSet('bikeSpeedVsIq_train.txt')
+    trainMat = mat(myTrainDat)
+    myTestDat = loadDataSet('bikeSpeedVsIq_test.txt')
+    testMat = mat(myTestDat)
+
+    myTree1 = createTree(trainMat, ops = (1, 20))
+    yHat1 = createForeCast(myTree1, testMat[:, 0])
+    a1 = corrcoef(yHat1, testMat[:, 1], rowvar=0)[0,1]
+    print(a1)
+
+    myTree2 = createTree(trainMat, modelLeaf,modelErr, (1,20))
+    yHat2 = createForeCast(myTree2, testMat[:,0], modelTreeEval)
+    a2 = corrcoef(yHat2, testMat[:,1], rowvar=0)[0,1]
+    print(a2)
+
+    ws, X, Y = linearSolve(trainMat)
+    print(ws)
+
+    for i in range(shape(testMat)[0]):
+        yHat2[i] = testMat[i,0] * ws[1, 0] + ws[0,0]
+    a3 = corrcoef(yHat2, testMat[:, 1], rowvar=0)[0, 1]
+    print(a3)
+
 if __name__ == '__main__':
-    # cart()
-    plotCart()
+    # plotCart()
     # plotLine()
+    plotBikeSpeedVsIq()
+
