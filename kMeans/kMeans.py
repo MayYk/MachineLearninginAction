@@ -115,6 +115,7 @@ def geoGrabBaidu(stAddress, city):
     c = urllib.request.urlopen(baiduApi)
     return json.loads(c.read())
 
+# 将获取的信息封装保存到文件
 def massPlaceFind(fileName):
     fw = open('chinaplace.txt','w', encoding="utf-8")
     for line in open(fileName, encoding="utf-8").readlines():
@@ -138,6 +139,7 @@ def distSLC(vecA, vecB):
     b = cos(vecA[0, 1] * pi/180) * cos(vecB[0, 1] * pi/180) * cos(pi * (vecB[0, 0]- vecA[0, 0])/180)
     return arccos(a + b) * 6371.0
 
+# 将文本文件中的城市及进行聚类并画出结果
 def clusterClubs(numClust=5):
     datList = []
     for line in open('chinaplace.txt',  encoding="utf-8").readlines():
