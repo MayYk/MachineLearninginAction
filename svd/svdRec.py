@@ -117,15 +117,17 @@ def svdEst(dataMat, user, simMeas, item):
     else:
         return ratSimTotal/simTotal
 
+# 打印矩阵，矩阵包含浮点数，必须定义浅色和深色
 def printMat(inMat, thresh=0.8):
     for i in range(32):
         for k in range(32):
             if float(inMat[i, k]) > thresh:
-                print (1,)
+                print(1,)
             else:
-                print (0,)
+                print(0,)
         print('')
 
+# 图像的压缩
 def imgCompress(numSV=3, thresh=0.8):
     myl = []
     for line in open('0_5.txt').readlines():
@@ -157,6 +159,7 @@ def decomposeTest():
     uu = U[:, :3] * Sig3 * VT[:3, :]
 
     print(uu)
+
 def simTest():
     myMat = mat(loadExData())
     simeuc = euclidSim(myMat[:, 0], myMat[:, 4])
