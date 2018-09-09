@@ -27,6 +27,7 @@ def classify0(inX, dataSet, labels, k):
     sqDistance = sqDiffMat.sum(axis=1)
 
     distances = sqDistance ** 0.5
+    # argsort 默认返回数组值从小到大的索引值
     sortedDistIndicies = distances.argsort()
     classCount = {}
 
@@ -60,6 +61,7 @@ def file2matrix(filename):
         returnMat[index,:] = listFromLine[0:3]
         classLabelVector.append(int(listFromLine[-1]))
         index += 1
+    fr.close()
     return returnMat,classLabelVector
 
 # 归一化特征值
@@ -70,7 +72,7 @@ def autoNorm(dataSet):
     normDataSet = zeros(shape(dataSet))
     m = dataSet.shape[0]
     normDataSet = dataSet - tile(minVals,(m,1))
-    normDataSet = dataSet/tile(ranges,(m,1))
+    normDataSet = normDataSet/tile(ranges,(m,1))
     return normDataSet, ranges, minVals
 
 def datingClassTest():
@@ -108,5 +110,12 @@ def classifyPerson():
 # ax.scatter(datingDataMat[:,0], datingDataMat[:,1], 15.0*array(datingLabels), 15.0*array(datingLabels))
 # plt.show()
 if __name__ == '__main__':
+    # datingDataMat,datingLabels = file2matrix('datingTestSet2.txt')
+    # fig = plt.figure()
+    # ax = fig.add_subplot(111)
+    # datingDataMat = autoNorm(datingDataMat)[0]
+    # ax.scatter(datingDataMat[:,0], datingDataMat[:,1], 15.0*array(datingLabels), 15.0*array(datingLabels))
+    # plt.show()
     datingClassTest()
+    # classify0()
 # classifyPerson()
